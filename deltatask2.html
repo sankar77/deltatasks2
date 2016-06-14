@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+
+var myGamePiece;
+var myObstacles = [];
+var gravity=0.6;
+//var go;
+var keypressed=false;
+var myScore;
+var v;
+var v1;
+
+function startGame() {
+    myGamePiece = new component1(30, 30, "dino.jpg", 10, 120,"image");
+    myScore = new component("30px", "Consolas", "black", 280, 40, "text");
+	myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+        },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    stop : function() {
+        clearInterval(this.interval);
+		alert("GAME OVER");
+		//alert("SCORE:"+ myGameArea.frameNo);
+		//go.text="GAME OVER";
+		//go.update();
+    }
+}
+
+function component(width, height, color, x, y,type) {
+    this.type=type;
+	if (type == "image") {
+        this.image = new Image();
+        this.image.src = "dino.jpg";
+    }
+	else if(type == "IMage"){
+	  this.image=new Image();
+	  this.image.src="cactus.jpg";
+	  }
+	//this.image = new Image();
+	this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = myGameArea.context;
+		if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+			}
+			
+		else if (type == "image") {
+            ctx.drawImage(this.image, 
+                this.x, 
+                this.y,
+                this.width, this.height);
+		}		
+		if (type == "IMage") {
+            ctx.drawImage(this.image, 
+                this.x, 
+                this.y,
+                this.width, this.height);
+		}		
+         else{		
+        ctx.fillStyle = color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+	}
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }    
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+function component1(width, height, color, x, y,type) {
+    this.type=type;
+	if (type == "image") {
+        this.image = new Image();
+        this.image.src = "dino.jpg";
+    }
+	/*else if(type == "IMage"){
+	  this.image=new Image();
+	  this.image.src="cactus.jpg";
+	  }*/
+	//this.image = new Image();
+	this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = myGameArea.context;
+		if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+			}
+			
+		else if (type == "image") {
+            ctx.drawImage(this.image, 
+                this.x, 
+                this.y,
+                this.width, this.height);
+		}		
+		/*if (type == "IMage") {
+            ctx.drawImage(this.image, 
+                this.x, 
+                this.y,
+                this.width, this.height);
+		}*/		
+         else{		
+        ctx.fillStyle = color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+	}
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }    
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+/*function component1(width, height, color, x, y) {
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+}*/
+//function comedown(){
+//alert("HI");
+//this.speedY += gravity;
+        //this.y += this.speedY;
+		
+//}		
+function updateGameArea() {
+    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+    for (i = 0; i < myObstacles.length; i += 1) {
+        if (myGamePiece.crashWith(myObstacles[i])) {
+            myGameArea.stop();
+            return;
+        }
+         else if(myGamePiece.y<=50){
+              myGameArea.stop();
+              return;			  
+    }
+	else if(myGamePiece.y>=180){
+	myGameArea.stop();
+	return;
+	}
+	}
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (myGameArea.frameNo == 1 || everyinterval(150)) {
+        x = myGameArea.canvas.width;
+        minHeight = 20;
+        maxHeight = 200;
+        height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
+        minGap = 50;
+        maxGap = 200;
+        gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+        //myObstacles.push(new component(10, height, "green", x, 0));
+        myObstacles.push(new component(30,40, "cactus.jpg", x,120,"IMage"));
+    }
+    for (i = 0; i < myObstacles.length; i += 1) {
+        myObstacles[i].x += -1;
+        myObstacles[i].update();
+    }
+    myScore.text="SCORE: " + myGameArea.frameNo;
+	myScore.update();
+	myGamePiece.newPos();    
+    myGamePiece.update();
+	//myObstacles.update();
+}
+
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+
+
+function moveup() {
+    myGamePiece.speedY = -1; 
+}
+
+function movedown() {
+    //alert("hi");
+    //myGamePiece.y = 100; 
+	if(myGamePiece.y<120){
+
+	myGamePiece.speedY += gravity;
+        myGamePiece.y += myGamePiece.speedY;
+		}
+		//myGamePiece.speedY=0;
+	//else if(myGamePiece.y==120){
+	//myGamePiece.speedY=0;
+     //}	
+		  
+}
+
+function moveleft() {
+    myGamePiece.speedX = -1; 
+}
+
+function moveright() {
+    myGamePiece.speedX = 1; 
+}
+
+function clearmove() {
+    myGamePiece.speedX = 0; 
+    myGamePiece.speedY = 0; 
+}
+/*var grass1 = new component(30, 30,"red",myGamePiece.x,myGamePiece.y);
+
+var requestAnim = window.requestAnimationFrame ||
+                    //window.webkitRequestAnimationFrame ||
+                    //window.mozRequestAnimationFrame ||
+                    setInterval;
+
+requestAnim(function loop() {
+    // Clear the screen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Redraw the grass where it is supposed to be
+    grass1.component1();
+    // If the key is pressed, set velocity to -5
+    if (keypressed) {
+        grass1.speedY = -1;
+        keypressed = false;
+    }
+    grass1.comedown();
+    // Do again
+    requestAnim(loop);
+});*/
+var ctr=0;
+var c;
+function doKeyDown(evt){
+switch (evt.keyCode) {
+case 38:  /* Up arrow was pressed */
+//keypressed=true;
+ctr++;
+//alert(ctr);
+v1=myGameArea.frameNo;
+if(ctr==3){
+alert(v1);
+v1+=100;
+}
+//alert(v1);
+//myGamePiece.y=60;
+myGamePiece.speedY -= gravity;
+        myGamePiece.y -= myGamePiece.speedY;
+ //keypressed=false;
+ //alert(myGamePiece.y);
+ //alert(myGamePiece.y + myGamePiece.speedY);
+ if (myGamePiece.y + myGamePiece.speedY <80) {
+ //alert(myGamePiece.y + myGamePiece.speedY);
+        // If so, move us back to ground level and set velocity to zero
+        //movedown();
+		//v=myGamePiece.frameNo;
+		
+		myGamePiece.speedY = 0;
+		//v=myGameArea.frameNo;
+		//if((v-v1)> 100){
+		//alert(v1);
+		//if(ctr==3)
+		  //if((v-v1)>100)
+		//myGamePiece.stop();
+		//}
+		movedown();
+		
+		//movedown();
+        //myGamePiece.y = 80;
+	}
+	//alert(v1);
+
+	
+	if((v1>500)&&(ctr==3)&&(myGamePiece.speedY==0)){
+//alert("h");
+myGameArea.stop();
+
+}
+	
+//myGamePiece.speedY = 0;
+		//movedown();	
+ //myGamePiece.y=80;
+ //movedown();
+
+//myGamePiece.movedown();
+}
+
+}
+/*if((v1>550)&&(ctr%3==0)&&(myGamePiece.speedY==0)){
+alert("h");
+myGameArea.stop();
+
+}*/
+
+window.addEventListener('keydown',doKeyDown,true);
+/*window.addEventListener('keydown', function (e) {
+    if (e.keyCode == '38') {
+        keypressed = true;
+		alert("HI");
+    }
+}, false);*/
+</script>
+<!--div style="text-align:center;width:480px;">
+  <!--button onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()">UP</button><br><br>
+  <button onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
+  <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button><br><br>
+  <button onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()"--><!--/button-->
+
+<p><b>INSTRUCTIONS:<br>
+1.Don't let the dinosaur move far away(up or down) from the cactus.<br>
+2.On pressing the up arrow key for the first time the dinosaur moves up.On the second click it goes down,<br>
+On the third click it moves horizontally and make sure it doesn't move horizontally over the cactus or else the game will be over.
+<br><br>
+HAPPY GAMING!!!
+</b></p>
+</body>
+
+</html>
